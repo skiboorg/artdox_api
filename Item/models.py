@@ -5,8 +5,27 @@ from io import BytesIO
 from django.core.files import File
 from django.utils.safestring import mark_safe
 
+def makeThumb(image):
+    fill_color = '#fff'
+    base_image = Image.open(image)
+    blob = BytesIO()
+    if base_image.mode in ('RGBA', 'LA'):
+        background = Image.new(base_image.mode[:-1], base_image.size, fill_color)
+        background.paste(base_image, base_image.split()[-1])
+        base_image = background
+
+    width, height = base_image.size
+    transparent = Image.new('RGB', (width, height), (0, 0, 0, 0))
+    transparent.paste(base_image, (0, 0))
+    transparent.thumbnail((235, 160), Image.ANTIALIAS)
+    transparent.save(blob, 'png', quality=100, optimize=True)
+    return blob
+
+class ItemStatus(models.Model):
+    name = models.CharField('Статус', max_length=100, blank=False, null=True)
 
 class Item(models.Model):
+    status = models.ForeignKey(ItemStatus, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField('Название', max_length=100, blank=False, null=True)
     name_slug = models.CharField('Название', max_length=100, blank=True, null=True, editable=False)
     article = models.CharField('Артикул', max_length=20, blank=False, null=True)
@@ -16,24 +35,15 @@ class Item(models.Model):
     price = models.IntegerField('Цена', default=0)
     image = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
     image_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
+    image_alt = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
+    image_alt_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.name_slug = slugify(self.name)
-        fill_color = '#fff'
-        base_image = Image.open(self.image)
-        blob = BytesIO()
-        if base_image.mode in ('RGBA', 'LA'):
-            background = Image.new(base_image.mode[:-1], base_image.size, fill_color)
-            background.paste(base_image, base_image.split()[-1])
-            base_image = background
-
-        width, height = base_image.size
-        transparent = Image.new('RGB', (width, height), (0, 0, 0, 0))
-        transparent.paste(base_image, (0, 0))
-        transparent.thumbnail((235, 160), Image.ANTIALIAS)
-        transparent.save(blob, 'png', quality=100, optimize=True)
         self.image_thumb.save(f'{self.name_slug}.jpg',
-                        File(blob), save=False)
+                        File(makeThumb(self.image)), save=False)
+        self.image_alt_thumb.save(f'{self.name_slug}_alt.jpg',
+                             File(makeThumb(self.image_alt)), save=False)
 
         super().save(*args, **kwargs)
 
