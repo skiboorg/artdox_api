@@ -10,9 +10,15 @@ from rest_framework.response import Response
 from Order.serializers import OrderSerializer
 # User = get_user_model()
 
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     orders = OrderSerializer(many=True, required=False, read_only=True)
+    transactions = TransactionSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = User
         fields = '__all__'

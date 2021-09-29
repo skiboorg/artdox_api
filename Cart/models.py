@@ -5,10 +5,8 @@ class Cart(models.Model):
     items = models.ManyToManyField('Item.Item', blank=True)
     price = models.IntegerField(default=0)
 
-    def save(self, *args, **kwargs):
-        self.price = 0
-        for item in self.items.all():
-            self.price += item.price
-
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #
+    #
+    #     super().save(*args, **kwargs)
 

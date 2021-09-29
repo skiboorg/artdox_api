@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db.models.signals import post_save
+from Cart.models import Cart
 
 
 class UserManager(BaseUserManager):
@@ -54,3 +56,19 @@ class User(AbstractUser):
         return f'{self.fio} {self.phone} '
 
 
+class Transaction(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='transactions')
+    amount = models.IntegerField(default=0)
+    is_buy = models.BooleanField(default=False)
+    type = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+def user_post_save(sender, instance, created, **kwargs):
+    """Создание всех значений по-умолчанию для нового пользовыателя"""
+    if created:
+        Cart.objects.create(user=instance)
+
+
+
+
+post_save.connect(user_post_save, sender=User)

@@ -37,13 +37,13 @@ class Item(models.Model):
     image_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
     image_alt = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
     image_alt_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
-
+    is_sell = models.BooleanField('Продано?',default=False)
     def save(self, *args, **kwargs):
         self.name_slug = slugify(self.name)
-        self.image_thumb.save(f'{self.name_slug}.jpg',
-                        File(makeThumb(self.image)), save=False)
-        self.image_alt_thumb.save(f'{self.name_slug}_alt.jpg',
-                             File(makeThumb(self.image_alt)), save=False)
+        # self.image_thumb.save(f'{self.name_slug}.jpg',
+        #                 File(makeThumb(self.image)), save=False)
+        # self.image_alt_thumb.save(f'{self.name_slug}_alt.jpg',
+        #                      File(makeThumb(self.image_alt)), save=False)
 
         super().save(*args, **kwargs)
 

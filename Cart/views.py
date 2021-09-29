@@ -5,24 +5,18 @@ from rest_framework.pagination import PageNumberPagination
 from .models import *
 from .serializers import *
 
-def getCart(request):
-    try:
-        cart = Cart.objects.get(user=request.user)
-    except:
-        cart = Cart.objects.create(user=request.user)
-    return cart
+
 
 
 class GetCart(generics.RetrieveAPIView):
     serializer_class = CartSerializer
-
     def get_object(self):
-        return getCart(self.request)
+        return Cart.objects.get(user=self.request.user)
 
 
 class AddToCart(APIView):
     def post(self,request):
-        cart = getCart(request)
+        cart = Cart.objects.get(user=self.request.user)
         data = request.data
         cart.items.add(data['id'])
         return Response(status=200)
