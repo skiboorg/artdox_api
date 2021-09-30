@@ -61,7 +61,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        print(validated_data)
         try:
             user = self.perform_create(validated_data)
         except IntegrityError:
