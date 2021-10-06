@@ -19,9 +19,12 @@ class TransactionSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     orders = OrderSerializer(many=True, required=False, read_only=True)
     transactions = TransactionSerializer(many=True, required=False, read_only=True)
+
     class Meta:
         model = User
         fields = '__all__'
+        extra_kwargs = {'password': {'required': False,
+                                  'allow_blank': True}}
 
 
 
