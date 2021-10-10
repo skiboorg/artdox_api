@@ -21,3 +21,6 @@ class GetItem(generics.RetrieveAPIView):
        return Item.objects.get(name_slug=self.request.query_params.get('slug'))
 
 
+class GetCollections(generics.ListAPIView):
+    serializer_class = CollectionSerializer
+    queryset = Collection.objects.all()

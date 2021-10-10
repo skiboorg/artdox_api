@@ -7,4 +7,5 @@ class ItemAdmin(SummernoteModelAdmin):
     # summernote_fields = ('description',)
 
 admin.site.register(Item)
+admin.site.register(Collection)
 admin.site.register(ItemStatus)

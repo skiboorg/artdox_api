@@ -1,5 +1,7 @@
 from django.db import models
 
+
+
 class Order(models.Model):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE, null=True, blank=True,related_name='orders')
     items = models.ManyToManyField('Item.Item', blank=True)
@@ -7,3 +9,14 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, related_name='order_items')
+    item = models.ForeignKey('Item.Item', on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.IntegerField(default=0)
+    price = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        self.price = self.item.price * self.amount
+        self.order.price += self.price
+        self.order.save()
+        super().save(*args, **kwargs)

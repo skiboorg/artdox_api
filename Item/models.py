@@ -21,10 +21,23 @@ def makeThumb(image):
     transparent.save(blob, 'png', quality=100, optimize=True)
     return blob
 
+
+class Collection(models.Model):
+    order = models.IntegerField('Порядок', default=100)
+    name = models.CharField('Название', max_length=100, blank=False, null=True)
+    name_slug = models.CharField('Название', max_length=100, blank=True, null=True, editable=False)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    class Meta:
+        ordering = ['order']
+
 class ItemStatus(models.Model):
     name = models.CharField('Статус', max_length=100, blank=False, null=True)
 
 class Item(models.Model):
+    collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name='items')
     status = models.ForeignKey(ItemStatus, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField('Название', max_length=100, blank=False, null=True)
     name_slug = models.CharField('Название', max_length=100, blank=True, null=True, editable=False)
@@ -33,11 +46,14 @@ class Item(models.Model):
     material = models.CharField('Материал', max_length=20, blank=False, null=True)
     description = models.TextField('Описание', blank=True, null=True)
     price = models.IntegerField('Цена', default=0)
+    total = models.IntegerField('Тираж', default=0)
+    left = models.IntegerField('Остаток', default=0)
     image = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
     image_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
     image_alt = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
     image_alt_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
     is_sell = models.BooleanField('Продано?',default=False)
+    is_ordered = models.BooleanField('Заказана?', default=False)
     def save(self, *args, **kwargs):
         self.name_slug = slugify(self.name)
         # self.image_thumb.save(f'{self.name_slug}.jpg',
@@ -46,6 +62,9 @@ class Item(models.Model):
         #                      File(makeThumb(self.image_alt)), save=False)
 
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.name}'
 
     def image_tag(self):
         # used in the admin site model as a "thumbnail"

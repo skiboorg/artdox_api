@@ -10,6 +10,10 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
+class CollectionSerializer(serializers.ModelSerializer):
+    items = ItemSerializer(many=True, required=False, read_only=True)
+    class Meta:
+        model = Collection
+        fields = '__all__'
 
 

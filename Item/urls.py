@@ -5,6 +5,7 @@ urlpatterns = [
 
 
     path('get/', views.GetItems.as_view()),
+    path('collections/', views.GetCollections.as_view()),
     path('one/', views.GetItem.as_view()),
 
 

@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from Order.serializers import OrderSerializer
 # User = get_user_model()
 
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
@@ -26,10 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'required': False,
                                   'allow_blank': True}}
 
-
-
-
 # djoser/utils.py проыерка на регу соц сетей
+
 
 class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={"input_type": "password"}, write_only=True)
