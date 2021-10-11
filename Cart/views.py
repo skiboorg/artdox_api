@@ -18,11 +18,10 @@ class AddToCart(APIView):
     def post(self,request):
         cart = Cart.objects.get(user=self.request.user)
         data = request.data
-        item, created = CartItem.objects.get_or_create(defaults={'item_id':data['id'],'cart':cart})
-        if created:
-            item.amount = data['amount']
-        else:
+        try:
+            item = CartItem.objects.get(item_id=data['id'], cart=cart)
             item.amount += data['amount']
-        item.save()
-
+            item.save()
+        except:
+            CartItem.objects.create(item_id=data['id'], cart=cart, amount = data['amount'])
         return Response(status=200)

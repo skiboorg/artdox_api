@@ -7,7 +7,7 @@ from rest_framework import exceptions, serializers, status, generics
 from .models import *
 from djoser.conf import settings
 from rest_framework.response import Response
-from Order.serializers import OrderSerializer
+
 # User = get_user_model()
 
 
@@ -18,7 +18,6 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    orders = OrderSerializer(many=True, required=False, read_only=True)
     transactions = TransactionSerializer(many=True, required=False, read_only=True)
 
     class Meta:
