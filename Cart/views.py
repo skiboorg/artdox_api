@@ -23,5 +23,5 @@ class AddToCart(APIView):
             item.amount += data['amount']
             item.save()
         except:
-            CartItem.objects.create(item_id=data['id'], cart=cart, amount = data['amount'])
+            item = CartItem.objects.create(item_id=data['id'], cart=cart, amount = data['amount'])
         return Response(status=200)

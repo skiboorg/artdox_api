@@ -8,18 +8,32 @@ from user.models import *
 from .serializers import *
 
 
-
-
 class CreateOrder(APIView):
     def post(self,request):
         cart = Cart.objects.get(user=self.request.user)
         new_order = Order.objects.create(user=request.user)
+
         for item in cart.items.all():
-            OrderItem.objects.create(order=new_order,item=item.item,amount=item.amount)
+            OrderItem.objects.create(order=new_order,
+                                     item=item.item,
+                                     amount=item.amount)
+
+            item.item.left -= item.amount
+            item.item.save()
+            request.user.total_amount += item.amount
             item.delete()
+
         cart.price = 0
         cart.save()
-        Transaction.objects.create(user=self.request.user, amount = new_order.price, is_buy = True, type='VISA')
+
+        request.user.total_summ += new_order.price
+        request.user.save()
+
+        Transaction.objects.create(user=self.request.user,
+                                   amount=new_order.price,
+                                   is_buy=True,
+                                   type='VISA')
+
         return Response(status=200)
 
 
