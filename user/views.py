@@ -14,6 +14,13 @@ class UserUpdate(APIView):
         user = request.user
 
         print(json.loads(request.data['userData']))
+
+        password = None
+        try:
+            password = json.loads(request.data['password'])
+        except:
+            pass
+
         selected_avatar = None
         try:
             selected_avatar = json.loads(request.data['selected_avatar'])
@@ -21,6 +28,9 @@ class UserUpdate(APIView):
             pass
         print(selected_avatar)
         serializer = UserSerializer(user, data=json.loads(request.data['userData']))
+        if password:
+            user.set_password(password)
+            user.save()
         if serializer.is_valid():
             serializer.save()
             for f in request.FILES.getlist('avatar'):
