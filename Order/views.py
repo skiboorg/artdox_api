@@ -11,7 +11,10 @@ from .serializers import *
 class CreateOrder(APIView):
     def post(self,request):
         cart = Cart.objects.get(user=self.request.user)
-        new_order = Order.objects.create(user=request.user)
+        new_order = Order.objects.create(user=request.user,
+                                         delivery=request.data.get('delivery'),
+                                         address=request.data.get('address'),
+                                         )
 
         for item in cart.items.all():
             OrderItem.objects.create(order=new_order,

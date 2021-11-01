@@ -5,6 +5,8 @@ from django.db import models
 class Order(models.Model):
     user = models.ForeignKey('user.User',on_delete=models.CASCADE, null=True, blank=True)
     price = models.IntegerField(default=0)
+    delivery = models.TextField('Доставка', blank=True, null=True)
+    address = models.TextField('Адрес', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
