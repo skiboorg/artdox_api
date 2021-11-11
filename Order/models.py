@@ -7,6 +7,7 @@ class Order(models.Model):
     price = models.IntegerField(default=0)
     delivery = models.TextField('Доставка', blank=True, null=True)
     address = models.TextField('Адрес', blank=True, null=True)
+    is_pay = models.BooleanField('Оплачен', default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

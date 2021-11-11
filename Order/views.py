@@ -98,12 +98,14 @@ class GetOrders(generics.ListAPIView):
         return Order.objects.filter(user=self.request.user)
 
 class PaymentNotify(APIView):
-    def get(self,request):
-        print('get')
-        print(self.request.query_params)
-        return Response(status=200)
-
     def post(self, request):
-        print('post')
         print(request.data)
+        data = request.data
+        payment_success = data['Success']
+        if payment_success:
+            order_id = data['OrderId']
+            print(order_id)
+            order = Order.objects.get(id=order_id)
+            order.is_pay = True
+            order.save()
         return Response(status=200)
