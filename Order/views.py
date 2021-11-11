@@ -75,18 +75,18 @@ class CreateOrder(APIView):
             item.item.left -= item.amount
             item.item.save()
             request.user.total_amount += item.amount
-            # item.delete()
+            item.delete()
 
-        # cart.price = 0
-        # cart.save()
-        #
-        # request.user.total_summ += new_order.price
-        # request.user.save()
-        #
-        # Transaction.objects.create(user=self.request.user,
-        #                            amount=new_order.price,
-        #                            is_buy=True,
-        #                            type='CARD')
+        cart.price = 0
+        cart.save()
+
+        request.user.total_summ += new_order.price
+        request.user.save()
+
+        Transaction.objects.create(user=self.request.user,
+                                   amount=new_order.price,
+                                   is_buy=True,
+                                   type='CARD')
         result = init_payment(new_order)
         return Response(result, status=200)
 
