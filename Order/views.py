@@ -7,7 +7,7 @@ from Cart.models import *
 from user.models import *
 from .serializers import *
 import requests
-import setting
+import settings
 import json
 
 def init_payment(order):
@@ -33,7 +33,7 @@ def init_payment(order):
         )
 
     payload = {
-        "TerminalKey": setting.TERMINAL_ID,
+        "TerminalKey": settings.TERMINAL_ID,
         "Amount": order.price * 100,
         "OrderId": order.id,
         "Description": f'Оплата заказа №{order.id}',
@@ -51,7 +51,7 @@ def init_payment(order):
         }
     }
     print(payload)
-    response = requests.post(setting.INIT_PAYMENT_URL,data=json.dumps(payload), headers=headers)
+    response = requests.post(settings.INIT_PAYMENT_URL, data=json.dumps(payload), headers=headers)
     response_json = response.json()
     if response_json['Success']:
         print(response_json['PaymentURL'])
