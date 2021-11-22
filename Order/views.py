@@ -108,4 +108,4 @@ class PaymentNotify(APIView):
             order = Order.objects.get(id=order_id)
             order.is_pay = True
             order.save()
-        return Response(status=200)
+        return Response('ОК', status=200)
