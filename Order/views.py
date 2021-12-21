@@ -9,6 +9,9 @@ from .serializers import *
 import requests
 import settings
 import json
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
 
 def init_payment(order):
     headers = {
@@ -50,11 +53,11 @@ def init_payment(order):
             "Items": items
         }
     }
-    print(payload)
+    #print(payload)
     response = requests.post(settings.INIT_PAYMENT_URL, data=json.dumps(payload), headers=headers)
     response_json = response.json()
     if response_json['Success']:
-        print(response_json['PaymentURL'])
+        #print(response_json['PaymentURL'])
         return {'success': True, 'payment_url':response_json['PaymentURL']}
     else:
         return {'success': False}
@@ -72,22 +75,27 @@ class CreateOrder(APIView):
                                      item=item.item,
                                      amount=item.amount)
 
-            item.item.left -= item.amount
-            item.item.save()
-            request.user.total_amount += item.amount
-            item.delete()
+        #     item.item.left -= item.amount
+        #     item.item.save()
+        #     request.user.total_amount += item.amount
+        #     item.delete()
+        #
+        # cart.price = 0
+        # cart.save()
+        #
+        # request.user.total_summ += new_order.price
+        # request.user.save()
+        #
+        # Transaction.objects.create(user=self.request.user,
+        #                            amount=new_order.price,
+        #                            is_buy=True,
+        #                            type='CARD')
+        # result = init_payment(new_order)
+        result = ''
+        msg_html = render_to_string('order.html', {'order': new_order})
 
-        cart.price = 0
-        cart.save()
-
-        request.user.total_summ += new_order.price
-        request.user.save()
-
-        Transaction.objects.create(user=self.request.user,
-                                   amount=new_order.price,
-                                   is_buy=True,
-                                   type='CARD')
-        result = init_payment(new_order)
+        send_mail('Ваш заказ', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL],
+                  fail_silently=False, html_message=msg_html)
         return Response(result, status=200)
 
 
@@ -99,13 +107,19 @@ class GetOrders(generics.ListAPIView):
 
 class PaymentNotify(APIView):
     def post(self, request):
-        print(request.data)
+        #print(request.data)
         data = request.data
         payment_success = data['Success']
         if payment_success:
             order_id = data['OrderId']
-            print(order_id)
+            #print(order_id)
             order = Order.objects.get(id=order_id)
             order.is_pay = True
             order.save()
+
+            msg_html = render_to_string('order.html', {'order': order})
+
+            send_mail('Ваш заказ', None, settings.SMTP_FROM, [order.user.email,settings.ADMIN_EMAIL],
+                      fail_silently=False, html_message=msg_html)
+
         return Response('ОК', status=200)
