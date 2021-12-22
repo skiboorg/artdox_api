@@ -14,6 +14,15 @@ class GetCart(generics.RetrieveAPIView):
         return Cart.objects.get(user=self.request.user)
 
 
+class DeleteItem(APIView):
+    def post(self,request):
+        data = request.data
+        print(data['id'])
+        CartItem.objects.get(id=data['id']).delete()
+
+        return Response(status=200)
+
+
 class AddToCart(APIView):
     def post(self,request):
         cart = Cart.objects.get(user=self.request.user)
