@@ -48,7 +48,6 @@ def init_payment(order):
         "Receipt": {
             "Email": order.user.email,
             "Phone": order.user.phone,
-            "EmailCompany": "b@test.ru",
             "Taxation": "osn",
             "Items": items
         }
@@ -56,6 +55,7 @@ def init_payment(order):
     #print(payload)
     response = requests.post(settings.INIT_PAYMENT_URL, data=json.dumps(payload), headers=headers)
     response_json = response.json()
+    print(response_json)
     if response_json['Success']:
         #print(response_json['PaymentURL'])
         return {'success': True, 'payment_url':response_json['PaymentURL']}
