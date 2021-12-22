@@ -75,27 +75,27 @@ class CreateOrder(APIView):
                                      item=item.item,
                                      amount=item.amount)
 
-        #     item.item.left -= item.amount
-        #     item.item.save()
-        #     request.user.total_amount += item.amount
-        #     item.delete()
-        #
-        # cart.price = 0
-        # cart.save()
-        #
-        # request.user.total_summ += new_order.price
-        # request.user.save()
-        #
-        # Transaction.objects.create(user=self.request.user,
-        #                            amount=new_order.price,
-        #                            is_buy=True,
-        #                            type='CARD')
-        # result = init_payment(new_order)
-        result = ''
-        msg_html = render_to_string('order.html', {'order': new_order})
+            item.item.left -= item.amount
+            item.item.save()
+            request.user.total_amount += item.amount
+            item.delete()
 
-        send_mail('Ваш заказ', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL],
-                  fail_silently=False, html_message=msg_html)
+        cart.price = 0
+        cart.save()
+
+        request.user.total_summ += new_order.price
+        request.user.save()
+
+        Transaction.objects.create(user=self.request.user,
+                                   amount=new_order.price,
+                                   is_buy=True,
+                                   type='CARD')
+        result = init_payment(new_order)
+        # result = ''
+        # msg_html = render_to_string('order.html', {'order': new_order})
+        #
+        # send_mail('Ваш заказ', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL],
+        #           fail_silently=False, html_message=msg_html)
         return Response(result, status=200)
 
 
