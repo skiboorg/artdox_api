@@ -58,7 +58,7 @@ def init_payment(order):
     print(response_json)
     if response_json['Success']:
         #print(response_json['PaymentURL'])
-        return {'success': True, 'payment_url':response_json['PaymentURL']}
+        return {'success': True, 'payment_url':response_json['PaymentURL'],'order_id':order.id}
     else:
         return {'success': False}
 
@@ -117,9 +117,9 @@ class PaymentNotify(APIView):
             order.is_pay = True
             order.save()
 
-            msg_html = render_to_string('order.html', {'order': order})
-
-            send_mail('Ваш заказ', None, settings.SMTP_FROM, [order.user.email,settings.ADMIN_EMAIL],
-                      fail_silently=False, html_message=msg_html)
+            # msg_html = render_to_string('order.html', {'order': order})
+            #
+            # send_mail('Ваш заказ', None, settings.SMTP_FROM, [order.user.email,settings.ADMIN_EMAIL],
+            #           fail_silently=False, html_message=msg_html)
 
         return Response('ОК', status=200)
