@@ -31,7 +31,7 @@ def init_payment(order):
                 "PaymentMethod": "full_payment",
                 "PaymentObject": "commodity",
                 "Tax": "vat10",
-                "Ean13": "0123456789"
+                "Ean13": ""
             },
         )
 
