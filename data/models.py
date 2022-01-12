@@ -9,4 +9,5 @@ class Banner(models.Model):
 class ContactForm(models.Model):
     subject = models.CharField('Название', max_length=100, blank=True, null=True)
     text = models.TextField('Текст', blank=True, null=True)
+    file = models.ImageField('Баннер', upload_to='form', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

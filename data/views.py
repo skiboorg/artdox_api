@@ -13,10 +13,13 @@ class GetBanners(generics.ListAPIView):
 class CForm(APIView):
     def post(self,request):
         print(request.data)
-        ContactForm.objects.create(
+        form = ContactForm.objects.create(
             subject=request.data['subject'],
             text=request.data['text'],
         )
+        if request.FILES.getlist('file'):
+            form.file = request.FILES.getlist('file')[0]
+            form.save()
         return Response(status=200)
 
 
