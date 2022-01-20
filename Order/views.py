@@ -105,6 +105,17 @@ class GetOrders(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
+class GetOrderItem(generics.RetrieveAPIView):
+    serializer_class = OrderItemSerializer
+
+    def get_object(self):
+        try:
+            item = OrderItem.objects.get(id=self.request.query_params.get('id'))
+            if item.order.user == self.request.user:
+                return item
+        except:
+            return []
+
 class PaymentNotify(APIView):
     def post(self, request):
         #print(request.data)
