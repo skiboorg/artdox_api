@@ -16,6 +16,8 @@ class OrderItem(models.Model):
     item = models.ForeignKey('Item.Item', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.IntegerField(default=0)
     price = models.IntegerField(default=0)
+    is_in_store = models.BooleanField('Заложено? ', default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def save(self, *args, **kwargs):
         self.price = self.item.price * self.amount

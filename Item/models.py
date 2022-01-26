@@ -53,6 +53,7 @@ class Item(models.Model):
     image_alt = models.ImageField('Большое изображение', upload_to='item/full', blank=True, null=True)
     image_alt_thumb = models.ImageField('Маленькое изображение', upload_to='item/thumb', blank=True, null=True)
     is_sell = models.BooleanField('Продано?',default=False)
+    is_nft = models.BooleanField('NFT',default=False)
     is_ordered = models.BooleanField('Заказана?', default=False)
     def save(self, *args, **kwargs):
         self.name_slug = slugify(self.name)
