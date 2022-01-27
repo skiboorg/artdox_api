@@ -42,7 +42,10 @@ class User(AbstractUser):
 
     is_email_verified = models.BooleanField('EMail подтвержден?', default=False , editable=False)
 
-    total_summ = models.IntegerField(default=0)
+    total_summ = models.DecimalField(decimal_places=2,max_digits=8,default=0)
+    total_in_localstore = models.IntegerField('На хранении', default=0)
+    total_in_store = models.IntegerField('Заложено карнит', default=0)
+    pay_summ = models.DecimalField(decimal_places=2,max_digits=8,default=0)
     total_amount = models.IntegerField(default=0)
 
 
@@ -72,3 +75,43 @@ def user_post_save(sender, instance, created, **kwargs):
 
 
 post_save.connect(user_post_save, sender=User)
+
+
+class WithdrawalRequest(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount = models.DecimalField(decimal_places=2, max_digits=8, default=0, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    is_done = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.is_done:
+            self.amount = self.user.pay_summ
+            self.user.pay_summ = 0
+            self.user.save()
+
+            orders = self.user.order_set.all()
+            for order in orders:
+                items = order.order_items.all()
+                for item in items:
+                    item.your_profit = 0
+                    item.save()
+        super().save(*args, **kwargs)
+
+# def withdrawal_request_post_save(sender, instance, created, **kwargs):
+#     if instance.is_done:
+#         instance.amount = instance.user.pay_summ
+#         instance.user.pay_summ = 0
+#         instance.user.save()
+#
+#         orders = instance.user.order_set.all()
+#         for order in orders:
+#             items = order.order_items.all()
+#             for item in items:
+#                 item.your_profit = 0
+#                 item.save()
+#
+#
+#
+#
+#
+# post_save.connect(withdrawal_request_post_save, sender=WithdrawalRequest)

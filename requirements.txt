@@ -6,4 +6,5 @@ pytils
 django-cleanup
 ##django-ckeditor
 django-summernote
-
+celery
+redis

@@ -1,3 +1,7 @@
+
+from django.utils import timezone
+from datetime import timedelta
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -63,16 +67,27 @@ def init_payment(order):
 
 class CreateOrder(APIView):
     def post(self,request):
+
+        is_in_localstore = False
+        if request.data.get('store') == 'store':
+            is_in_localstore = True
+
         cart = Cart.objects.get(user=self.request.user)
         new_order = Order.objects.create(user=request.user,
                                          delivery=request.data.get('delivery'),
                                          address=request.data.get('address'),
+                                         is_in_localstore=is_in_localstore
                                          )
 
         for item in cart.items.all():
             OrderItem.objects.create(order=new_order,
                                      item=item.item,
-                                     amount=item.amount)
+                                     amount=item.amount,
+                                     pay_date=timezone.now() + timedelta(days=30),
+                                     is_in_localstore=is_in_localstore
+                                     )
+            if is_in_localstore:
+                request.user.total_in_localstore +=item.amount
 
             item.item.left -= item.amount
             item.item.save()
@@ -115,6 +130,7 @@ class GetOrderItem(generics.RetrieveAPIView):
         except:
             return []
 
+
 class PaymentNotify(APIView):
     def post(self, request):
         #print(request.data)
@@ -133,3 +149,11 @@ class PaymentNotify(APIView):
             #           fail_silently=False, html_message=msg_html)
 
         return Response('ОК', status=200)
+
+class Test(APIView):
+    def get(self, request):
+        from .tasks import checkOrderItems
+        checkOrderItems()
+        return Response('ОК', status=200)
+
+

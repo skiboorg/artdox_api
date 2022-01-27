@@ -65,3 +65,7 @@ class UserRecoverPassword(APIView):
         else:
             return Response({'result': False}, status=200)
 
+class WithdrawalRequestView(APIView):
+    def post(self, request):
+        WithdrawalRequest.objects.create(user=request.user)
+        return Response('ОК', status=200)
