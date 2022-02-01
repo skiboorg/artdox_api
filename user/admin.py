@@ -3,3 +3,4 @@ from .models import *
 
 admin.site.register(User)
 admin.site.register(WithdrawalRequest)
+admin.site.register(PaymentType)

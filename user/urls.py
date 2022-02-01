@@ -8,6 +8,7 @@ urlpatterns = [
     path('update', views.UserUpdate.as_view()),
     path('recover_password', views.UserRecoverPassword.as_view()),
     path('withdrawal_request', views.WithdrawalRequestView.as_view()),
+    path('payment_types', views.PaymentSystems.as_view()),
 
 
 

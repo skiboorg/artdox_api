@@ -4,7 +4,9 @@ from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 from .models import *
 from .serializers import *
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+import settings
 
 class GetBanners(generics.ListAPIView):
     serializer_class = BannerSerializer
@@ -31,6 +33,15 @@ class RForm(APIView):
             item_id=request.data['id'],
             text=request.data['text'],
         )
+
+        msg_html = render_to_string('return_client.html', {
+            'id': form.id,
+            'user': request.user,
+            'item':form.item
+        })
+
+        # send_mail(f'Запрос №{form.id} на возврат картины', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL],
+        #           fail_silently=False, html_message=msg_html)
         return Response({'id':form.id},status=200)
 
 

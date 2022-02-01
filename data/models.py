@@ -5,6 +5,10 @@ class Banner(models.Model):
     image = models.ImageField('Баннер', upload_to='banner', blank=True, null=True)
     image_mob = models.ImageField('Баннер мобильный', upload_to='banner', blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Баннер"
+        verbose_name_plural = "Баннеры"
+
 
 class ContactForm(models.Model):
     subject = models.CharField('Название', max_length=100, blank=True, null=True)
@@ -12,12 +16,28 @@ class ContactForm(models.Model):
     text = models.TextField('Текст', blank=True, null=True)
     file = models.ImageField('Баннер', upload_to='form', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_done = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Форма обратной связи от {self.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Форма обратной связи"
+        verbose_name_plural = "Формы обратной связи"
 
 
 class ReturnForm(models.Model):
     item = models.ForeignKey('Order.OrderItem', on_delete=models.CASCADE,blank=True, null=True)
     text = models.TextField('Текст', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_done = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'№{self.id} | Запрос на возврат от {self.item.order.user.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Запрос на возврат"
+        verbose_name_plural = "Запросы на возврат"
 
 
 class StoreForm(models.Model):
@@ -26,6 +46,7 @@ class StoreForm(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_in_store = models.BooleanField(default=False)
     is_return_store = models.BooleanField(default=False)
+    is_done = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.is_in_store:
@@ -40,3 +61,9 @@ class StoreForm(models.Model):
             self.item.save()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f'№{self.id} | Запрос на заклад от {self.item.order.user.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Запрос на заклад"
+        verbose_name_plural = "Запросы на заклад"

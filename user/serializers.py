@@ -16,6 +16,11 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
 
+class PaymentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentType
+        fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     transactions = TransactionSerializer(many=True, required=False, read_only=True)

@@ -11,6 +11,10 @@ class Order(models.Model):
     is_in_localstore = models.BooleanField('С хранением?', default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, blank=True, null=True, related_name='order_items')
@@ -30,3 +34,6 @@ class OrderItem(models.Model):
         self.order.price += self.price
         self.order.save()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.item}'

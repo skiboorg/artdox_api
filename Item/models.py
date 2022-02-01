@@ -32,9 +32,18 @@ class Collection(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = "Коллекция"
+        verbose_name_plural = "Коллекции"
 
 class ItemStatus(models.Model):
     name = models.CharField('Статус', max_length=100, blank=False, null=True)
+
+    def __str__(self):
+        return f'{self.name}'
+
+    class Meta:
+        verbose_name = "Статус"
+        verbose_name_plural = "Статусы"
 
 class Item(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name='items')
@@ -66,6 +75,10 @@ class Item(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
 
     def image_tag(self):
         # used in the admin site model as a "thumbnail"

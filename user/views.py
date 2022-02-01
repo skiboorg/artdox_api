@@ -67,5 +67,18 @@ class UserRecoverPassword(APIView):
 
 class WithdrawalRequestView(APIView):
     def post(self, request):
-        WithdrawalRequest.objects.create(user=request.user)
-        return Response('ОК', status=200)
+        payment_type = request.data.get('payment_type')
+        if payment_type != 0:
+            item = WithdrawalRequest.objects.create(user=request.user,
+                                                    payment_type_id=payment_type,
+                                                    message=request.data.get('message'),
+                                                    )
+        else:
+            item = WithdrawalRequest.objects.create(user=request.user,
+                                                    message=request.data.get('message'),
+                                                    )
+        return Response({'id':item.id}, status=200)
+
+class PaymentSystems(generics.ListAPIView):
+    queryset = PaymentType.objects.all()
+    serializer_class = PaymentTypeSerializer
