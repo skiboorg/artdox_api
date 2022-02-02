@@ -6,10 +6,27 @@ from djoser import utils
 from rest_framework import exceptions, serializers, status, generics
 from .models import *
 from djoser.conf import settings
+from Order.serializers import OrderItemSerializer
 from rest_framework.response import Response
 
 # User = get_user_model()
 
+class ReturnFormSerializer(serializers.ModelSerializer):
+    item = OrderItemSerializer(many=False,required=False,read_only=True)
+    class Meta:
+        model = ReturnForm
+        fields = '__all__'
+
+class StoreFormSerializer(serializers.ModelSerializer):
+    item = OrderItemSerializer(many=False, required=False, read_only=True)
+    class Meta:
+        model = StoreForm
+        fields = '__all__'
+
+class ContactFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactForm
+        fields = '__all__'
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,10 +38,18 @@ class PaymentTypeSerializer(serializers.ModelSerializer):
         model = PaymentType
         fields = '__all__'
 
+class WithdrawalRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WithdrawalRequest
+        fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     transactions = TransactionSerializer(many=True, required=False, read_only=True)
-
+    return_requests = ReturnFormSerializer(many=True, required=False, read_only=True)
+    contact_requests = ContactFormSerializer(many=True, required=False, read_only=True)
+    store_requests = StoreFormSerializer(many=True, required=False, read_only=True)
+    withdrawal_requests = WithdrawalRequestSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = User
         fields = '__all__'

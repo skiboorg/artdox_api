@@ -42,11 +42,11 @@ class User(AbstractUser):
 
     is_email_verified = models.BooleanField('EMail подтвержден?', default=False , editable=False)
 
-    total_summ = models.DecimalField(decimal_places=2,max_digits=8,default=0)
+    total_summ = models.DecimalField('Сумма куртин',decimal_places=2,max_digits=8,default=0)
     total_in_localstore = models.IntegerField('На хранении', default=0)
-    total_in_store = models.IntegerField('Заложено карнит', default=0)
-    pay_summ = models.DecimalField(decimal_places=2,max_digits=8,default=0)
-    total_amount = models.IntegerField(default=0)
+    total_in_store = models.IntegerField('Заложено картин', default=0)
+    pay_summ = models.DecimalField('К выплате',decimal_places=2,max_digits=8,default=0)
+    total_amount = models.IntegerField('Всего картин',default=0)
 
 
     USERNAME_FIELD = 'email'
@@ -61,9 +61,9 @@ class User(AbstractUser):
 
 class Transaction(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='transactions')
-    amount = models.IntegerField(default=0)
-    is_buy = models.BooleanField(default=False)
-    type = models.CharField(max_length=20)
+    amount = models.IntegerField('Сумма', default=0)
+    is_buy = models.BooleanField('Покупка? False - возврат', default=True)
+    type = models.CharField('Тип',max_length=20)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
 def user_post_save(sender, instance, created, **kwargs):
@@ -86,7 +86,7 @@ class PaymentType(models.Model):
         verbose_name_plural = "Платежные системы"
 
 class WithdrawalRequest(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='withdrawal_requests')
     payment_type = models.ForeignKey(PaymentType,on_delete=models.CASCADE, null=True)
     message = models.TextField(blank=True, null=True)
     amount = models.DecimalField(decimal_places=2, max_digits=8, default=0, blank=True)
@@ -113,3 +113,66 @@ class WithdrawalRequest(models.Model):
     class Meta:
         verbose_name = "Запрос на вывод"
         verbose_name_plural = "Запросы на вывод"
+
+
+class ContactForm(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='contact_requests')
+    subject = models.CharField('Название', max_length=100, blank=True, null=True)
+    email = models.CharField('email', max_length=100, blank=True, null=True)
+    text = models.TextField('Текст', blank=True, null=True)
+    file = models.ImageField('Баннер', upload_to='form', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_done = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Форма обратной связи от {self.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Форма обратной связи"
+        verbose_name_plural = "Формы обратной связи"
+
+
+class ReturnForm(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='return_requests')
+    item = models.ForeignKey('Order.OrderItem', on_delete=models.CASCADE,blank=True, null=True)
+    text = models.TextField('Текст', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_done = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'№{self.id} | Запрос на возврат от {self.item.order.user.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Запрос на возврат"
+        verbose_name_plural = "Запросы на возврат"
+
+
+class StoreForm(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,
+                             related_name='store_requests')
+    item = models.ForeignKey('Order.OrderItem', on_delete=models.CASCADE, blank=True, null=True)
+    text = models.TextField('Текст', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_in_store = models.BooleanField(default=False)
+    is_return_store = models.BooleanField(default=False)
+    is_done = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.is_in_store:
+            self.item.order.user.total_in_store += self.item.amount
+            self.item.is_in_store = True
+            self.item.order.user.save()
+            self.item.save()
+        if self.is_return_store:
+            self.item.order.user.total_in_store -= self.item.amount
+            self.item.is_in_store = False
+            self.item.order.user.save()
+            self.item.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'№{self.id} | Запрос на заклад от {self.item.order.user.email} | {self.created_at}'
+
+    class Meta:
+        verbose_name = "Запрос на заклад"
+        verbose_name_plural = "Запросы на заклад"
