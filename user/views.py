@@ -9,6 +9,8 @@ from rest_framework import generics
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
+import settings
+
 class UserUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -79,6 +81,14 @@ class WithdrawalRequestView(APIView):
             item = WithdrawalRequest.objects.create(user=request.user,
                                                     message=request.data.get('message'),
                                                     )
+        msg_html = render_to_string('withdrawal.html', {
+            'id': item.id,
+            'user': request.user,
+            'amount': request.user.pay_summ
+        })
+
+        send_mail(f'Запрос №{item.id} на вывод', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL,request.user.email],
+                  fail_silently=False, html_message=msg_html)
         return Response({'id':item.id}, status=200)
 
 class PaymentSystems(generics.ListAPIView):
@@ -121,8 +131,8 @@ class RForm(APIView):
             'item':form.item
         })
 
-        # send_mail(f'Запрос №{form.id} на возврат картины', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL],
-        #           fail_silently=False, html_message=msg_html)
+        send_mail(f'Запрос №{form.id} на возврат картины', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL,request.user.email],
+                  fail_silently=False, html_message=msg_html)
         return Response({'id':form.id},status=200)
 
 
@@ -132,4 +142,12 @@ class SForm(APIView):
             item_id=request.data['id'],
             text=request.data['text'],
         )
+        msg_html = render_to_string('store.html', {
+            'id': form.id,
+            'user': request.user,
+            'item': form.item
+        })
+
+        send_mail(f'Запрос №{form.id} на заклад картины', None, settings.SMTP_FROM, [settings.ADMIN_EMAIL,request.user.email],
+                  fail_silently=False, html_message=msg_html)
         return Response({'id': form.id}, status=200)

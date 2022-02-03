@@ -70,7 +70,7 @@
                                                                             <tbody>
                                                                                 <tr>
                                                                                     <td align="center" class="esd-block-text es-p10b es-m-txt-c">
-                                                                                        <h1 style="font-size: 46px; line-height: 100%;">Запрос №{{ id }} на <br>возврат картины</h1>
+                                                                                        <h1 style="font-size: 46px; line-height: 100%;">Запрос №{{ id }} на вывод</h1>
                                                                                     </td>
                                                                                 </tr>
                                                                             </tbody>
@@ -124,7 +124,7 @@
                                                                             <tbody>
                                                                                 <tr>
                                                                                     <td align="left" class="esd-block-text" style="background: #F8F9F9;padding: 4px 24px">
-                                                                                        <p>Детали возврата:<br></p>
+                                                                                        <p>Детали :<br></p>
                                                                                     </td>
                                                                                 </tr>
                                                                             </tbody>
@@ -148,13 +148,9 @@
                                                                                         <p>
                                                                                             <span style="font-size: 12px;color: #838C93">Имя покупателя<br></span> <br>
                                                                                             {{   user.fio }}<br><br>
-                                                                                            <span style="font-size: 12px;color: #838C93">Заказ<br></span> <br>
-                                                                                            №{{ item.order.id }}
-                                                                                            <br><br>
+
                                                                                             <span style="font-size: 12px;color: #838C93">Сумма<br></span> <br>
-                                                                                            {{ item.price }} ₽<br><br>
-                                                                                            <span style="font-size: 12px;color: #838C93">Адрес  отеделния СДЭКа для отправки картины</span> <br><br>
-                                                                                            г. Москва, СДЭК №13, ул. Кантемировская дом 7А
+                                                                                            {{ amount }} ₽
                                                                                         </p>
                                                                                     </td>
                                                                                 </tr>
